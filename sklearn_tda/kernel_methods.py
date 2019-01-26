@@ -136,9 +136,17 @@ class PersistenceFisherDistance(BaseEstimator, TransformerMixin):
             self.approx_diagonal_ = [self.kernel_approx_.transform(self.diagonal_projections_[i]) for i in range(len(X))]
         return self
 
+    def __condition(self, X):
+        if len(self.diagrams_[0]) == len(X[0]):
+            return (self.diagrams_[0] == X[0]).all()
+        elif (len(self.diagrams_[0])==1) or (len(X[0])==1):
+            return (self.diagrams_[0] == X[0]).all()
+        else:
+            return self.diagrams_ == X
+
     def transform(self, X):
         Xfit = np.zeros((len(X), len(self.diagrams_)))
-        if self.diagrams_ == X:
+        if self.__condition(X):
             for i in range(len(self.diagrams_)):
                 for j in range(i+1, len(self.diagrams_)):
                     if self.kernel_approx_ is not None:
